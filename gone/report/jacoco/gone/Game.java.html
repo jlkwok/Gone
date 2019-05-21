@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Game.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gone</a> &gt; <a href="index.source.html" class="el_package">gone</a> &gt; <span class="el_source">Game.java</span></div><h1>Game.java</h1><pre class="source lang-java linenums">package gone;
+
+import java.util.HashSet;
+import java.util.Set;
+
+/* 
+ * Lucas: playWith, replaceBlackPebblesAroundLocation, edits from last week
+ * Jess: boardContainsBlackPebbles, replaceIfBlackPebble, offsetBy
+ * all types of testing for each method
+ */
+
+<span class="nc" id="L12">public class Game {</span>
+	
+	public static Result playWith(Set&lt;Location&gt; whitePebbleLocations, boolean[][] blackPebbles) {
+<span class="fc" id="L15">		Set&lt;Location&gt; newWhitePebbleLocations = new HashSet&lt;Location&gt;();</span>
+		
+<span class="fc bfc" id="L17" title="All 2 branches covered.">		for (Location whitePebble : whitePebbleLocations) {</span>
+<span class="fc" id="L18">			replaceBlackPebblesAroundLocation(whitePebble, blackPebbles, newWhitePebbleLocations);</span>
+<span class="fc" id="L19">		}</span>
+		
+<span class="fc bfc" id="L21" title="All 2 branches covered.">		if (newWhitePebbleLocations.isEmpty()) {</span>
+			// Will only be true whenever the for loop doesn't run
+<span class="fc" id="L23">			return new Result(0, boardContainsBlackPebbles(blackPebbles));</span>
+		} else {
+<span class="fc" id="L25">			Result nextTurn = playWith(newWhitePebbleLocations, blackPebbles);</span>
+<span class="fc" id="L26">			nextTurn.setNumberOfIterations(nextTurn.getNumberOfIterations() + 1);</span>
+			
+<span class="fc" id="L28">			return nextTurn;</span>
+		}
+	}
+	
+	private static boolean boardContainsBlackPebbles(boolean[][] blackPebbles) {
+		// Improve variable names
+<span class="fc bfc" id="L34" title="All 2 branches covered.">		for (boolean[] row : blackPebbles) {</span>
+<span class="fc bfc" id="L35" title="All 2 branches covered.">			for (boolean spot : row) {</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">				if (spot == true) {</span>
+<span class="fc" id="L37">					return true;</span>
+				}
+			}
+		}
+		
+<span class="fc" id="L42">		return false;</span>
+	}
+	
+	private static void replaceBlackPebblesAroundLocation(Location location, boolean[][] blackPebbles, Set&lt;Location&gt; newWhitePebbles) {
+<span class="fc" id="L46">		Set&lt;Location&gt; adjacentLocations = new HashSet&lt;Location&gt;();</span>
+<span class="fc" id="L47">		adjacentLocations.add(location.offsetBy(-1, 0));	// left</span>
+<span class="fc" id="L48">		adjacentLocations.add(location.offsetBy(1, 0));		// right</span>
+<span class="fc" id="L49">		adjacentLocations.add(location.offsetBy(0, -1));	// above</span>
+<span class="fc" id="L50">		adjacentLocations.add(location.offsetBy(0, 1));		// below</span>
+		
+<span class="fc bfc" id="L52" title="All 2 branches covered.">		for (Location adjacentLocation : adjacentLocations) {</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">			if (locationIsOnBoard(adjacentLocation, blackPebbles)) {</span>
+<span class="fc" id="L54">				replaceIfBlackPebble(adjacentLocation, blackPebbles, newWhitePebbles);</span>
+			}
+<span class="fc" id="L56">		}</span>
+<span class="fc" id="L57">	}</span>
+	
+	private static boolean locationIsOnBoard(Location location, boolean[][] board) {
+		// Follow number line
+		// Pull out into its own method
+<span class="fc bfc" id="L62" title="All 8 branches covered.">		return location.getRow() &gt;= 0 &amp;&amp; location.getRow() &lt; board.length &amp;&amp; location.getColumn() &gt;= 0 &amp;&amp; location.getColumn() &lt; board[0].length;</span>
+	}
+	
+	private static void replaceIfBlackPebble(Location location, boolean[][] blackPebbles, Set&lt;Location&gt; newWhitePebbles) {
+<span class="fc bfc" id="L66" title="All 2 branches covered.">		if (blackPebbles[location.getRow()][location.getColumn()]) {</span>
+<span class="fc" id="L67">			blackPebbles[location.getRow()][location.getColumn()] = false;</span>
+<span class="fc" id="L68">			newWhitePebbles.add(location);</span>
+		}
+<span class="fc" id="L70">	}</span>
+	
+	public static class Result {
+		
+		private int numberOfIterations;
+		private boolean blackPebblesLeft;
+		
+		/**
+		 * @param numberOfIterations
+		 * @param blackPebblesLeft
+		 */
+<span class="fc" id="L81">		public Result(int numberOfIterations, boolean blackPebblesLeft) {</span>
+<span class="fc" id="L82">			this.numberOfIterations = numberOfIterations;</span>
+<span class="fc" id="L83">			this.blackPebblesLeft = blackPebblesLeft;</span>
+<span class="fc" id="L84">		}</span>
+		
+		/**
+		 * @return numberOfIterations
+		 */
+		public int getNumberOfIterations() {
+<span class="fc" id="L90">			return numberOfIterations;</span>
+		}
+		
+		/**
+		 * @param numberOfIterations
+		 */
+		public void setNumberOfIterations(int numberOfIterations) {
+<span class="fc" id="L97">			this.numberOfIterations = numberOfIterations;</span>
+<span class="fc" id="L98">		}</span>
+		
+		/**
+		 * @return blackPebblesLeft
+		 */
+		public boolean isBlackPebblesLeft() {
+<span class="fc" id="L104">			return blackPebblesLeft;</span>
+		}
+		
+		/**
+		 * @param blackPebblesLeft
+		 */
+		public void setBlackPebblesLeft(boolean blackPebblesLeft) {
+<span class="nc" id="L111">			this.blackPebblesLeft = blackPebblesLeft;</span>
+<span class="nc" id="L112">		}</span>
+		
+	}
+	
+<span class="nc" id="L116">	public static class TestHook {</span>
+		
+		public static boolean locationIsOnBoard(Location location, boolean[][] board) {
+<span class="fc" id="L119">			return Game.locationIsOnBoard(location, board);</span>
+		}
+		
+		public static void replaceBlackPebblesAroundLocation(Location location, boolean[][] blackPebbles, Set&lt;Location&gt; newWhitePebbles) {
+<span class="fc" id="L123">			Game.replaceBlackPebblesAroundLocation(location, blackPebbles, newWhitePebbles);</span>
+<span class="fc" id="L124">		}</span>
+		
+		public static boolean boardContainsBlackPebbles(boolean[][] blackPebbles) {
+<span class="fc" id="L127">			return Game.boardContainsBlackPebbles(blackPebbles);</span>
+		}
+		
+		public static void replaceIfBlackPebble(Location location, boolean[][] blackPebbles, Set&lt;Location&gt; newWhitePebbles) {
+<span class="fc" id="L131">			Game.replaceIfBlackPebble(location, blackPebbles, newWhitePebbles);</span>
+<span class="fc" id="L132">		}</span>
+		
+	}
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>

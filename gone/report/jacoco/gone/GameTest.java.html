@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameTest.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">gone</a> &gt; <a href="index.source.html" class="el_package">gone</a> &gt; <span class="el_source">GameTest.java</span></div><h1>GameTest.java</h1><pre class="source lang-java linenums">package gone;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import org.junit.*;
+
+<span class="fc" id="L12">public class GameTest {</span>
+	
+	private int massiveBoardSize;
+	private boolean[][] massiveBoard;
+	
+	// Helper method
+	private Set&lt;Location&gt; makePebbleSet(Location... locations) {
+<span class="fc" id="L19">		Set&lt;Location&gt; set = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L20" title="All 2 branches covered.">		for (Location location : locations) {</span>
+<span class="fc" id="L21">			set.add(location);</span>
+		}
+<span class="fc" id="L23">		return set;</span>
+	}
+	
+	@Before
+	public void setup() {
+<span class="fc" id="L28">		massiveBoardSize = 5001;</span>
+<span class="fc" id="L29">		massiveBoard = new boolean[massiveBoardSize][massiveBoardSize];</span>
+<span class="fc bfc" id="L30" title="All 2 branches covered.">		for (int i = 0;i &lt; massiveBoardSize;i++) {</span>
+<span class="fc bfc" id="L31" title="All 2 branches covered.">			for (int j = 0;j &lt; massiveBoardSize;j++) {</span>
+<span class="fc" id="L32">				massiveBoard[i][j] = true;</span>
+			}
+		}
+		
+<span class="fc" id="L36">		massiveBoard[(massiveBoardSize - 1) / 2][(massiveBoardSize - 1) / 2] = false;</span>
+<span class="fc" id="L37">	}</span>
+	
+	/**
+	 * Method: playWith
+	 * 
+	 * Structured basis: nominal case, all boolean conditions true: white pebbles exist but no pebbles replaced
+	 */
+	@Test
+	public void playWithNominalTest() {
+<span class="fc" id="L46">		Set&lt;Location&gt; whitePebbleLocations = makePebbleSet(new Location(0, 0));</span>
+<span class="fc" id="L47">		boolean[][] blackPebbles = new boolean[3][3];</span>
+<span class="fc" id="L48">		blackPebbles[2][2] = true;</span>
+		
+<span class="fc" id="L50">		Game.Result result = Game.playWith(whitePebbleLocations, blackPebbles);</span>
+		
+<span class="fc" id="L52">		assertEquals(0, result.getNumberOfIterations());</span>
+<span class="fc" id="L53">		assertTrue(result.isBlackPebblesLeft());</span>
+<span class="fc" id="L54">		assertTrue(blackPebbles[2][2]);</span>
+<span class="fc" id="L55">	}</span>
+	
+	/**
+	 * Method: playWith
+	 * 
+	 * Structured basis: for condition is false (no white pebbles)
+	 */
+	@Test
+	public void playWithNoWhitePebblesShouldDoNothing() {
+<span class="fc" id="L64">		Set&lt;Location&gt; whitePebbleLocations = makePebbleSet();</span>
+<span class="fc" id="L65">		boolean[][] blackPebbles = new boolean[3][3];</span>
+<span class="fc" id="L66">		blackPebbles[2][2] = true;</span>
+		
+<span class="fc" id="L68">		Game.Result result = Game.playWith(whitePebbleLocations, blackPebbles);</span>
+		
+<span class="fc" id="L70">		assertEquals(0, result.getNumberOfIterations());</span>
+<span class="fc" id="L71">		assertTrue(result.isBlackPebblesLeft());</span>
+<span class="fc" id="L72">		assertTrue(blackPebbles[2][2]);</span>
+<span class="fc" id="L73">	}</span>
+	
+	/**
+	 * Method: playWith
+	 * 
+	 * Structured basis: if condition is false: replacements made
+	 * Good data: arrangement with replacements to be made
+	 */
+	@Test
+	public void playWithExampleShouldWorkAsExpected() {
+<span class="fc" id="L83">		Set&lt;Location&gt; whitePebbleLocations = makePebbleSet(new Location(0, 1), new Location(0, 2));</span>
+<span class="fc" id="L84">		boolean[][] blackPebbles = { { true, false, false }, { true, true, true }, { true, false, false }, { false, false, true } };</span>
+		
+<span class="fc" id="L86">		Game.Result result = Game.playWith(whitePebbleLocations, blackPebbles);</span>
+<span class="fc" id="L87">		assertEquals(3, result.getNumberOfIterations());</span>
+<span class="fc" id="L88">		assertTrue(result.isBlackPebblesLeft());</span>
+<span class="fc" id="L89">		assertTrue(blackPebbles[3][2]);</span>
+<span class="fc" id="L90">	}</span>
+	
+	/**
+	 * Method: playWith
+	 * 
+	 * Bad data: whitePebbleLocations is null
+	 */
+	@Test (expected = NullPointerException.class)
+	public void playWithNullWhitePebblesShouldFail() {
+<span class="nc" id="L99">		Game.playWith(null, new boolean[3][3]);</span>
+<span class="nc" id="L100">	}</span>
+	
+	/**
+	 * Method: playWith
+	 * 
+	 * Stress test: extremely large board, with a high number of replacements
+	 */
+	@Test
+	public void playWithMassiveBoard() {
+<span class="fc" id="L109">		Set&lt;Location&gt; whitePebbleLocations = makePebbleSet(new Location((massiveBoardSize - 1) / 2, (massiveBoardSize - 1) / 2));</span>
+		
+<span class="fc" id="L111">		Game.Result result = Game.playWith(whitePebbleLocations, massiveBoard);</span>
+<span class="fc" id="L112">		assertEquals(massiveBoardSize - 1, result.getNumberOfIterations());</span>
+<span class="fc" id="L113">		assertFalse(result.isBlackPebblesLeft());</span>
+<span class="fc" id="L114">	}</span>
+	
+	// At the end, any pebble that's white should be touching only other white pebbles
+	// Black pebbles only touching other black pebbles
+	// There shouldn't be any pebbles in new locations, only color should change
+	
+	/**
+	 * Method: boardContainsBlackPebbles
+	 * 
+	 * Bad data: blackPebbles is null
+	 * Boundary analysis: outer for each loop skipped
+	 */
+	@Test (expected = NullPointerException.class)
+	public void nullFailureBoardContainsBlackPebbles() {
+<span class="nc" id="L128">		Game.TestHook.boardContainsBlackPebbles(null);</span>
+<span class="nc" id="L129">	}</span>
+	
+	/**
+	 * Method: boardContainsBlackPebbles
+	 * 
+	 * Structured basis: nominal case, boolean condition is true, blackPebbles is not empty
+	 * Good data: nominal case: 1 black pebble
+	 * Boundary analysis: multiple passes through outer for each loop
+	 * Compound boundary analysis: multiple passes through inner for each loop
+	 */
+	@Test 
+	public void boardContainsBlackPebbles() {
+<span class="fc" id="L141">		boolean[][] blackPebbles = new boolean[3][3];</span>
+<span class="fc" id="L142">		blackPebbles[2][2] = true;</span>
+<span class="fc" id="L143">		assertTrue(Game.TestHook.boardContainsBlackPebbles(blackPebbles));</span>
+<span class="fc" id="L144">	}</span>
+	
+	/**
+	 * Method: boardContainsBlackPebbles
+	 * 
+	 * Structured basis: nominal case, boolean condition is true, blackPebbles is empty
+	 * Good data: nominal case: 0 black pebbles
+	 * Boundary analysis: multiple passes through outer for each loop
+	 * Compound boundary analysis: multiple passes through inner for each loop
+	 */
+	@Test 
+	public void boardContainsNoBlackPebbles() {
+<span class="fc" id="L156">		assertFalse(Game.TestHook.boardContainsBlackPebbles(new boolean[3][3]));</span>
+<span class="fc" id="L157">	}</span>
+	
+	/**
+	 * Method: boardContainsBlackPebbles
+	 * 
+	 * Structured basis: outer for loop condition not met
+	 * Bad data: too little data
+	 * Boundary analysis: 0 passes through outer loop
+	 * Compound boundary analysis: 0 passes through inner loop
+	 */
+	@Test 
+	public void emptyBoardContainsBlackPebbles() {
+<span class="fc" id="L169">		assertFalse(Game.TestHook.boardContainsBlackPebbles(new boolean[0][0]));</span>
+<span class="fc" id="L170">	}</span>
+	
+	/**
+	 * Method: replaceBlackPebblesAroundLocation
+	 * 
+	 * Structured basis: nominal case, all boolean conditions are true
+	 * Good data: normal size board, all adjacent locations on board
+	 * Data flow: blackPebbles being replaced based on location
+	 */
+	@Test
+	public void shouldReplacePebblesAroundLocationNominal() {
+<span class="fc" id="L181">		boolean[][] blackPebbles = { { true, true, true }, { true, true, true }, { true, true, true } };</span>
+<span class="fc" id="L182">		Set&lt;Location&gt; newWhitePebbles = makePebbleSet();</span>
+		
+<span class="fc" id="L184">		Game.TestHook.replaceBlackPebblesAroundLocation(new Location(1, 1), blackPebbles, newWhitePebbles);</span>
+		
+<span class="fc" id="L186">		assertEquals(4, newWhitePebbles.size());</span>
+<span class="fc" id="L187">		assertFalse(blackPebbles[0][1]);</span>
+<span class="fc" id="L188">		assertFalse(blackPebbles[1][0]);</span>
+<span class="fc" id="L189">		assertFalse(blackPebbles[1][2]);</span>
+<span class="fc" id="L190">		assertFalse(blackPebbles[2][1]);</span>
+<span class="fc" id="L191">	}</span>
+	
+	/**
+	 * Method: replaceBlackPebblesAroundLocation
+	 * 
+	 * Structured basis: if condition is false
+	 * Good data: normal size board, location on top left edge
+	 * Data flow: blackPebbles being replaced based on location
+	 */
+	@Test
+	public void shouldReplacePebblesOnBoardAndSkipPebblesOffBoard() {
+<span class="fc" id="L202">		boolean[][] blackPebbles = { { true, true, true }, { true, true, true }, { true, true, true } };</span>
+<span class="fc" id="L203">		Set&lt;Location&gt; newWhitePebbles = makePebbleSet();</span>
+		
+<span class="fc" id="L205">		Game.TestHook.replaceBlackPebblesAroundLocation(new Location(0, 0), blackPebbles, newWhitePebbles);</span>
+		
+<span class="fc" id="L207">		assertEquals(2, newWhitePebbles.size());</span>
+<span class="fc" id="L208">		assertFalse(blackPebbles[0][1]);</span>
+<span class="fc" id="L209">		assertFalse(blackPebbles[1][0]);</span>
+<span class="fc" id="L210">	}</span>
+	
+	/**
+	 * Method: replaceBlackPebblesAroundLocation
+	 * 
+	 * Bad data: location is null
+	 */
+	@Test (expected = NullPointerException.class)
+	public void shouldFailReplacingAroundNullLocation() {
+<span class="fc" id="L219">		boolean[][] board = new boolean[3][3];</span>
+<span class="fc" id="L220">		Set&lt;Location&gt; newWhitePebbles = makePebbleSet();</span>
+		
+<span class="nc" id="L222">		Game.TestHook.replaceBlackPebblesAroundLocation(null, board, newWhitePebbles);</span>
+<span class="nc" id="L223">	}</span>
+	
+	/**
+	 * Method: replaceBlackPebblesAroundLocation
+	 * 
+	 * Bad data: location is null
+	 */
+	@Test (expected = IndexOutOfBoundsException.class)
+	public void shouldFailReplacingWithNonUniformBoardSize() {
+<span class="fc" id="L232">		boolean[][] board = { { true, true, true }, { true, true }, { true, true, true } };</span>
+<span class="fc" id="L233">		Set&lt;Location&gt; newWhitePebbles = makePebbleSet();</span>
+		
+<span class="nc" id="L235">		Game.TestHook.replaceBlackPebblesAroundLocation(new Location(0, 2), board, newWhitePebbles);</span>
+<span class="nc" id="L236">	}</span>
+	
+	/**
+	 * Method: locationIsOnBoard
+	 * 
+	 * Boundary analysis: 0 &lt; location.getRow() &lt; board.length
+	 * Boundary analysis: 0 &lt; location.getColumn() &lt; board[0].length
+	 */
+	@Test
+	public void locationShouldBeOnBoardCenter() {
+<span class="fc" id="L246">		assertTrue(Game.TestHook.locationIsOnBoard(new Location(1, 1), new boolean[3][3]));</span>
+<span class="fc" id="L247">	}</span>
+	
+	/**
+	 * Method: locationIsOnBoard
+	 * 
+	 * Boundary analysis: location.getRow() = 0
+	 */
+	@Test
+	public void locationShouldBeOnBoardTopEdge() {
+<span class="fc" id="L256">		assertTrue(Game.TestHook.locationIsOnBoard(new Location(0, 1), new boolean[3][3]));</span>
+<span class="fc" id="L257">	}</span>
+	
+	/**
+	 * Method: locationIsOnBoard
+	 * 
+	 * Boundary analysis: location.getRow() &lt; 0
+	 */
+	@Test
+	public void locationShouldBeOffBoardTopEdge() {
+<span class="fc" id="L266">		assertFalse(Game.TestHook.locationIsOnBoard(new Location(-1, 1), new boolean[3][3]));</span>
+<span class="fc" id="L267">	}</span>
+	
+	/**
+	 * Method: locationIsOnBoard
+	 * 
+	 * Boundary analysis: location.getRow() &gt;= board.length
+	 */
+	@Test
+	public void locationShouldBeOffBoardBottomEdge() {
+<span class="fc" id="L276">		assertFalse(Game.TestHook.locationIsOnBoard(new Location(3, 1), new boolean[3][3]));</span>
+<span class="fc" id="L277">	}</span>
+	
+	/**
+	 * Method: locationIsOnBoard
+	 * 
+	 * Boundary analysis: location.getColumn() = 0
+	 */
+	@Test
+	public void locationShouldBeOnBoardLeftEdge() {
+<span class="fc" id="L286">		assertTrue(Game.TestHook.locationIsOnBoard(new Location(1, 0), new boolean[3][3]));</span>
+<span class="fc" id="L287">	}</span>
+	
+	/**
+	 * Method: locationIsOnBoard
+	 * 
+	 * Boundary analysis: location.getColumn() &lt; 0
+	 */
+	@Test
+	public void locationShouldBeOffBoardLeftEdge() {
+<span class="fc" id="L296">		assertFalse(Game.TestHook.locationIsOnBoard(new Location(1, -1), new boolean[3][3]));</span>
+<span class="fc" id="L297">	}</span>
+	
+	/**
+	 * Method: locationIsOnBoard
+	 * 
+	 * Boundary analysis: location.getColumn() &gt;= board[0].length
+	 */
+	@Test
+	public void locationShouldBeOffBoardRightEdge() {
+<span class="fc" id="L306">		assertFalse(Game.TestHook.locationIsOnBoard(new Location(1, 3), new boolean[3][3]));</span>
+<span class="fc" id="L307">	}</span>
+	
+	/**
+	 * Method: locationIsOnBoard
+	 * 
+	 * Bad data: null board
+	 */
+	@Test (expected = NullPointerException.class)
+	public void shouldFailToCheckLocationOnNullBoard() {
+<span class="nc" id="L316">		Game.TestHook.locationIsOnBoard(new Location(1, 3), null);</span>
+<span class="nc" id="L317">	}</span>
+	
+	/**
+	 * Method: locationIsOnBoard
+	 * 
+	 * Bad data: out of bounds index
+	 * Boundary analysis: location.getRow() &gt;= board.length
+	 */
+	@Test (expected = IndexOutOfBoundsException.class)
+	public void replaceIfBlackPebbleLocationOffBoardBottomEdge() {
+<span class="nc" id="L327">		Game.TestHook.replaceIfBlackPebble(new Location(3, 1), new boolean[3][3], makePebbleSet());</span>
+<span class="nc" id="L328">	}</span>
+	
+	/**
+	 * Method: locationIsOnBoard
+	 * 
+	 * Bad data: out of bounds index
+	 * Compound boundary analysis: location.getColumn() &lt; 0
+	 */
+	@Test (expected = IndexOutOfBoundsException.class)
+	public void replaceIfBlackPebbleLocationOffBoardLeftEdge() {
+<span class="nc" id="L338">		Game.TestHook.replaceIfBlackPebble(new Location(1, -1), new boolean[3][3], makePebbleSet());</span>
+<span class="nc" id="L339">	}</span>
+	
+	/**
+	 * Method: locationIsOnBoard
+	 * 
+	 * Bad data: out of bounds index
+	 * Compound boundary analysis: location.getColumn() &gt;= board[0].length
+	 */
+	@Test (expected = IndexOutOfBoundsException.class)
+	public void replaceIfBlackPebbleLocationOffBoardRightEdge() {
+<span class="nc" id="L349">		Game.TestHook.replaceIfBlackPebble(new Location(1, 3), new boolean[3][3], makePebbleSet());</span>
+<span class="nc" id="L350">	}</span>
+	
+	/**
+	 * Method: replaceIfBlackPebble
+	 * 
+	 * Bad data: all params are null
+	 */
+	@Test (expected = NullPointerException.class)
+	public void nullParamsReplaceIfBlackPebble() {
+<span class="nc" id="L359">		Game.TestHook.replaceIfBlackPebble(null, null, null);</span>
+<span class="nc" id="L360">	}</span>
+	
+	/**
+	 * Method: replaceIfBlackPebble
+	 * 
+	 * Structured basis: boolean condition true
+	 * Good data: nominal case: location is a black pebble
+	 * Boundary analysis: location.getRow() within array indices
+	 * Compound boundary analysis: location.getColumn() within array indices
+	 * Data flow: newWhitePebbles being altered if blackPebble is replaced
+	 */
+	@Test 
+	public void replaceIfBlackPebbleTrue() {
+<span class="fc" id="L373">		boolean[][] blackPebbles = { { true, true, true }, { true, true, true }, { true, true, true } };</span>
+<span class="fc" id="L374">		Set&lt;Location&gt; newWhitePebbles = makePebbleSet();</span>
+		
+<span class="fc" id="L376">		Game.TestHook.replaceIfBlackPebble(new Location(0, 0), blackPebbles, newWhitePebbles);</span>
+		
+<span class="fc" id="L378">		assertEquals(1, newWhitePebbles.size());</span>
+<span class="fc" id="L379">		assertFalse(blackPebbles[0][0]);</span>
+<span class="fc" id="L380">	}</span>
+	
+	/**
+	 * Method: replaceIfBlackPebble
+	 * 
+	 * Structured basis: boolean condition false
+	 * Good data: nominal case: location is not a black pebble
+	 * Boundary analysis: location.getRow() within array indices
+	 * Compoun boundary analysis: location.getColumn() within array indices
+	 * Data flow: newWhitePebbles being altered if blackPebble is replaced
+	 */
+	@Test
+	public void replaceIfBlackPebbleNullSpotOnBoard() {
+<span class="fc" id="L393">		boolean[][] blackPebbles = { { true, true, true }, { true, true, false }, { true, true, true } };</span>
+<span class="fc" id="L394">		Set&lt;Location&gt; newWhitePebbles = makePebbleSet();</span>
+		
+<span class="fc" id="L396">		Game.TestHook.replaceIfBlackPebble(new Location(1, 2), blackPebbles, newWhitePebbles);</span>
+		
+<span class="fc" id="L398">		assertEquals(0, newWhitePebbles.size());</span>
+<span class="fc" id="L399">	}</span>
+	
+	/**
+	 * Method: replaceIfBlackPebble
+	 * 
+	 * Bad data: out of bounds index
+	 * Boundary analysis: location.getRow() &lt; 0
+	 */
+	@Test (expected = IndexOutOfBoundsException.class)
+	public void replaceIfBlackPebbleLocationOffBoardTopEdge() {
+<span class="nc" id="L409">		Game.TestHook.replaceIfBlackPebble(new Location(-1, 1), new boolean[3][3], makePebbleSet());</span>
+<span class="nc" id="L410">	}</span>
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.3.201901230119</span></div></body></html>
